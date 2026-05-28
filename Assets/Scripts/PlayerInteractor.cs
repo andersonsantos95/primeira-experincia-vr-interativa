@@ -2,7 +2,7 @@ using UnityEngine;
 using TMPro;
 
 // Gerencia a interação do jogador com objetos da cena via raycast
-// Pressione E para interagir com um quadro ou porta ao olhar para ele
+// Pressione E para interagir com quadros, porta ou esculturas ao olhar para eles
 public class PlayerInteractor : MonoBehaviour
 {
     [SerializeField] private float distanciaInteracao = 5f;
@@ -28,20 +28,27 @@ public class PlayerInteractor : MonoBehaviour
         // Lança um raio do centro da câmera para frente
         Ray ray = new Ray(Camera.main.transform.position, Camera.main.transform.forward);
 
-        if (Physics.Raycast(ray, out RaycastHit hit, distanciaInteracao))
-        {
-            // Verifica se é um quadro interativo
-            InteracaoQuadro quadro = hit.collider.GetComponent<InteracaoQuadro>();
-            if (quadro != null)
-            {
-                quadro.Interagir(painelInfo, textoInfo);
-                return;
-            }
+        if (!Physics.Raycast(ray, out RaycastHit hit, distanciaInteracao)) return;
 
-            // Verifica se é a porta (busca o script no pai para respeitar a dobradiça)
-            InteracaoPorta porta = hit.collider.GetComponentInParent<InteracaoPorta>();
-            if (porta != null)
-                porta.Interagir();
+        // Quadro interativo
+        InteracaoQuadro quadro = hit.collider.GetComponent<InteracaoQuadro>();
+        if (quadro != null)
+        {
+            quadro.Interagir(painelInfo, textoInfo);
+            return;
         }
+
+        // Porta (busca no pai para respeitar a dobradiça)
+        InteracaoPorta porta = hit.collider.GetComponentInParent<InteracaoPorta>();
+        if (porta != null)
+        {
+            porta.Interagir();
+            return;
+        }
+
+        // Escultura flutuante
+        EsculturaFlutuante escultura = hit.collider.GetComponent<EsculturaFlutuante>();
+        if (escultura != null)
+            escultura.Interagir();
     }
 }

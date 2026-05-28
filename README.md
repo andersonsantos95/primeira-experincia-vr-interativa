@@ -45,6 +45,8 @@ O objetivo do espaço é simular uma experiência de visitação cultural imersi
 
 - **Câmera Cinemachine:** O Starter Assets utiliza Cinemachine para seguir o jogador. Foi necessário vincular manualmente o `PlayerCameraRoot` (filho do `PlayerCapsule`) aos campos Follow e Look At do `PlayerFollowCamera` para que a câmera funcionasse corretamente.
 
+- **Outros objetos se movendo junto com as esculturas:** Ao usar `transform.position` (espaço global) para animar a oscilação das esculturas flutuantes, os valores de X e Z eram lidos do estado atual do objeto a cada frame, causando interferência visual em outros elementos da cena. A solução foi migrar para `transform.localPosition`, armazenando a posição inicial local no `Start()` e fixando X e Z sempre na posição inicial — garantindo que apenas o eixo Y oscile e que nenhum outro objeto seja afetado.
+
 ---
 
 ## Configuração Técnica
