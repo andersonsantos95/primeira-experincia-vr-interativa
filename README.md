@@ -1,4 +1,4 @@
-# Primeira Experiência VR Interativa — Museu Virtual
+# Museu Orbital VR — Primeira Experiência VR Interativa
 
 **Aluno:** Anderson Santos da Silva
 
@@ -6,17 +6,20 @@
 
 ## Apresentando o Projeto
 
-Este projeto consiste em um **Museu Virtual** desenvolvido em Unity com suporte a Realidade Virtual via Meta XR SDK e OpenXR. O ambiente apresenta uma sala de exposição com quadros interativos, esculturas em pedestais e iluminação interna, compondo um espaço cultural navegável em primeira pessoa.
+Este projeto consiste em um **Museu Orbital Virtual** desenvolvido em Unity com suporte a Realidade Virtual via Meta XR SDK e OpenXR. O ambiente representa uma estação museal flutuando em órbita da Terra, visível pela skybox ao sair pela porta de entrada. O interior apresenta quadros interativos, esculturas levitantes em pedestais e iluminação azulada de estação espacial, compondo uma experiência cultural futurista navegável em primeira pessoa.
 
-O visitante pode explorar o museu livremente e interagir com dois tipos de objetos: ao pressionar **E** olhando para um quadro, ele é destacado com uma cor diferente, um som de chime é reproduzido e um painel com o título e o nome do artista é exibido na tela. Ao pressionar **E** olhando para a porta da entrada, ela abre ou fecha suavemente.
+O visitante pode explorar o museu e interagir com três tipos de objetos:
+- **Quadros**: pressione **E** olhando para um quadro — ele é destacado, um som de chime é reproduzido e um painel exibe o título e o artista da obra
+- **Porta**: pressione **E** olhando para a porta — ela abre ou fecha suavemente, revelando a vista do espaço exterior
+- **Esculturas levitantes**: pressione **E** olhando para uma escultura — a oscilação e rotação aceleram ao máximo com o som de propulsão intensificado, desacelerando gradualmente até o idle
 
 ---
 
 ## Contexto e Objetivos
 
-O ambiente representa um **museu cultural no contexto do Metaverso**, com foco em educação e entretenimento. No Metaverso, museus virtuais permitem que pessoas de qualquer parte do mundo acessem exposições de arte e cultura sem barreiras geográficas ou físicas.
+O ambiente representa um **museu cultural orbital no contexto do Metaverso**, com foco em educação, cultura e entretenimento futurista. A proposta é um espaço museológico que transcende a limitação física e geográfica — um museu acessível a qualquer pessoa com um headset VR, localizado simbolicamente em órbita da Terra como metáfora da universalidade do conhecimento e da arte no Metaverso.
 
-O objetivo do espaço é simular uma experiência de visitação cultural imersiva, onde o usuário pode se aproximar das obras e consultar informações sobre elas de forma interativa — reproduzindo digitalmente a experiência de um museu presencial, com o potencial de escalar para exposições globais acessíveis a qualquer pessoa com um headset VR ou computador.
+As esculturas levitantes com propulsão reforçam a ambientação de baixa gravidade do espaço, enquanto os quadros interativos reproduzem a função educacional de um museu tradicional em formato digital imersivo.
 
 ---
 
@@ -28,24 +31,29 @@ O objetivo do espaço é simular uma experiência de visitação cultural imersi
 
 2. **Movimentação no PC:** Para atender ao requisito de movimentação no Editor sem depender do headset, foi utilizado o pacote **Starter Assets - FirstPerson (URP)** da Unity Technologies, que fornece um controlador em primeira pessoa com WASD e mouse.
 
-3. **Ambiente:** A sala do museu foi construída com primitivos do Unity (Plane, Cube, Sphere, Capsule), organizados em grupos lógicos na Hierarchy (`Sala` e `Exposicao`). Foram criados materiais com cores distintas para cada elemento, dando identidade visual ao espaço.
+3. **Ambiente:** A sala do museu foi construída com primitivos do Unity (Plane, Cube, Sphere, Capsule), organizados em grupos lógicos na Hierarchy (`Sala` e `Exposicao`). A identidade visual de estação espacial foi criada com materiais em tons metálicos azul-acinzentados e iluminação interna fria. A skybox orbital (Terra vista do espaço) é visível ao sair pela porta, reforçando o conceito.
 
-4. **Interação:** A interação foi implementada em C# com três scripts:
-   - `InteracaoQuadro.cs`: gerencia o estado de cada quadro — alterna a cor de destaque, reproduz um som de chime gerado proceduralmente (sem arquivo externo) e exibe as informações da obra.
-   - `InteracaoPorta.cs`: controla a abertura e fechamento suave da porta via rotação animada em torno da dobradiça.
-   - `PlayerInteractor.cs`: lança um raycast do centro da câmera ao pressionar E, detecta quadros e a porta, acionando a interação correspondente.
+4. **Interações:** Foram implementadas em C# com quatro scripts:
+   - `InteracaoQuadro.cs`: alterna cor de destaque, reproduz som de chime procedural e exibe informações da obra.
+   - `InteracaoPorta.cs`: abre e fecha suavemente a porta via rotação animada em torno da dobradiça.
+   - `EsculturaFlutuante.cs`: oscila e gira as esculturas continuamente; ao interagir, salta para intensidade máxima e desacelera sozinho com o tempo. O som de propulsão é gerado proceduralmente e acompanha a intensidade da animação.
+   - `PlayerInteractor.cs`: lança raycast do centro da câmera ao pressionar E, detectando e acionando qualquer objeto interagível.
 
-5. **UI:** Um painel Canvas (Screen Space Overlay) exibe o título e o artista da obra ao interagir, com um crosshair central para auxiliar a mira.
+5. **UI:** Um painel Canvas (Screen Space Overlay) exibe o título e o artista da obra ao interagir com quadros, com crosshair central para auxiliar a mira.
 
 ### Principais dificuldades
 
-- **Conflito entre Input System e OnMouseDown:** A interação inicial usava `OnMouseDown()`, que entrava em conflito com o novo Input System do projeto e com o cursor lock do FPS controller. A solução foi migrar para um raycast via tecla E no `Update()`, eliminando o conflito.
+- **Conflito entre Input System e OnMouseDown:** A interação inicial usava `OnMouseDown()`, que entrava em conflito com o novo Input System do projeto e com o cursor lock do FPS controller. A solução foi migrar para raycast via tecla E no `Update()`.
 
-- **Configuração do OpenXR no Editor:** A ativação do OpenXR na aba PC causava a renderização estéreo (tela dividida) no Editor, dificultando os testes. A solução foi desativar OpenXR e Mock HMD na aba PC para testes no Editor, mantendo a configuração apenas para Android.
+- **Configuração do OpenXR no Editor:** A ativação do OpenXR na aba PC causava renderização estéreo (tela dividida) no Editor. A solução foi desativar OpenXR e Mock HMD na aba PC para testes, mantendo a configuração apenas para Android.
 
-- **Câmera Cinemachine:** O Starter Assets utiliza Cinemachine para seguir o jogador. Foi necessário vincular manualmente o `PlayerCameraRoot` (filho do `PlayerCapsule`) aos campos Follow e Look At do `PlayerFollowCamera` para que a câmera funcionasse corretamente.
+- **Câmera Cinemachine:** Foi necessário vincular manualmente o `PlayerCameraRoot` (filho do `PlayerCapsule`) aos campos Follow e Look At do `PlayerFollowCamera` para a câmera funcionar corretamente.
 
-- **Outros objetos se movendo junto com as esculturas:** Ao usar `transform.position` (espaço global) para animar a oscilação das esculturas flutuantes, os valores de X e Z eram lidos do estado atual do objeto a cada frame, causando interferência visual em outros elementos da cena. A solução foi migrar para `transform.localPosition`, armazenando a posição inicial local no `Start()` e fixando X e Z sempre na posição inicial — garantindo que apenas o eixo Y oscile e que nenhum outro objeto seja afetado.
+- **Outros objetos se movendo junto com as esculturas:** Ao usar `transform.position` para animar a oscilação, valores de X e Z eram lidos do estado atual a cada frame, causando interferência visual. A solução foi migrar para `transform.localPosition` com X e Z fixos na posição inicial.
+
+- **Vazamento de luz nas junções das paredes:** A Directional Light padrão do Unity atravessa geometria fina, causando luz visível nas junções das paredes. A solução foi remover a Directional Light e depender exclusivamente do Point Light interno e da luz externa para iluminar a cena.
+
+- **Z-fighting nas junções das paredes:** Paredes com faces coplanares nos cantos causavam artefatos visuais (chanfro). A solução foi fazer as paredes Leste e Oeste com Scale Z=9.2, posicionando suas extremidades rentes às faces externas das paredes Norte e Sul, eliminando qualquer sobreposição de faces.
 
 ---
 
@@ -63,4 +71,5 @@ O objetivo do espaço é simular uma experiência de visitação cultural imersi
 2. Carregue a cena `Assets/Scenes/SampleScene.unity`
 3. Clique em **Play**
 4. Use **WASD** para mover e **mouse** para olhar
-5. Aproxime-se de um quadro, olhe para ele e pressione **E** para interagir
+5. Pressione **E** olhando para quadros, porta ou esculturas para interagir
+6. Saia pela porta para ver o ambiente orbital externo
