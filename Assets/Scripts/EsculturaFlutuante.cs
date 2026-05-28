@@ -25,9 +25,15 @@ public class EsculturaFlutuante : MonoBehaviour
     // Distância máxima que a escultura desce da posição inicial (evita atravessar o pedestal)
     [SerializeField] private float limiteInferior = 0.08f;
 
+    // Tempo de arranque suave ao iniciar a cena
+    private const float STARTUP_DURATION = 3f;
+
     private Vector3 posicaoInicial;
     private AudioSource audioSource;
     private float decayTimer = 0f;
+    private float startupTimer = 0f;
+    private float fase = 0f;
+    private float amplitudeAtual = 0f;
 
     private void Start()
     {
@@ -46,16 +52,25 @@ public class EsculturaFlutuante : MonoBehaviour
 
     private void Update()
     {
+        // Arranque suave: aumenta de 0 a 1 nos primeiros STARTUP_DURATION segundos
+        startupTimer = Mathf.Min(1f, startupTimer + Time.deltaTime / STARTUP_DURATION);
+        float startup = Mathf.SmoothStep(0f, 1f, startupTimer);
+
         // Decai o timer suavemente até zero (idle)
         decayTimer = Mathf.Max(0f, decayTimer - Time.deltaTime);
         float t = decayTimer / DECAY_DURATION; // 1 = máximo, 0 = idle
 
-        float amplitude  = Mathf.Lerp(AMP_BASE,  AMP_MAX,  t);
-        float frequencia = Mathf.Lerp(FREQ_BASE,  FREQ_MAX, t);
-        float rotSpeed   = Mathf.Lerp(ROT_BASE,   ROT_MAX,  t);
+        float amplitudeAlvo = Mathf.Lerp(AMP_BASE, AMP_MAX, t) * startup;
+        float frequencia    = Mathf.Lerp(FREQ_BASE, FREQ_MAX, t);
+        float rotSpeed      = Mathf.Lerp(ROT_BASE,  ROT_MAX,  t) * startup;
 
-        // Oscilação vertical com clamp — X e Z fixos na posição inicial
-        float rawY  = posicaoInicial.y + Mathf.Sin(Time.time * frequencia) * amplitude;
+        // Suaviza a amplitude para evitar saltos bruscos ao interagir
+        amplitudeAtual = Mathf.Lerp(amplitudeAtual, amplitudeAlvo, Time.deltaTime * 3f);
+
+        // Fase acumulada — evita salto de posição ao mudar frequência
+        fase += frequencia * Time.deltaTime;
+
+        float rawY  = posicaoInicial.y + Mathf.Sin(fase) * amplitudeAtual;
         float novoY = Mathf.Max(posicaoInicial.y - limiteInferior, rawY);
         transform.localPosition = new Vector3(posicaoInicial.x, novoY, posicaoInicial.z);
 
@@ -66,7 +81,7 @@ public class EsculturaFlutuante : MonoBehaviour
         float targetPitch  = Mathf.Lerp(PITCH_BASE,  PITCH_MAX,  t);
         float targetVolume = Mathf.Lerp(VOLUME_BASE, VOLUME_MAX, t);
         audioSource.pitch  = Mathf.Lerp(audioSource.pitch,  targetPitch,  Time.deltaTime * 2f);
-        audioSource.volume = Mathf.Lerp(audioSource.volume, targetVolume, Time.deltaTime * 2f);
+        audioSource.volume = Mathf.Lerp(audioSource.volume, targetVolume * startup, Time.deltaTime * 2f);
     }
 
     // Ao pressionar E: salta para máximo e reseta o timer de decaimento
