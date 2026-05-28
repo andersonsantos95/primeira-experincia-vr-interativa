@@ -8,7 +8,7 @@
 
 Este projeto consiste em um **Museu Virtual** desenvolvido em Unity com suporte a Realidade Virtual via Meta XR SDK e OpenXR. O ambiente apresenta uma sala de exposição com quadros interativos, esculturas em pedestais e iluminação interna, compondo um espaço cultural navegável em primeira pessoa.
 
-O visitante pode explorar o museu livremente e interagir com os quadros expostos: ao pressionar **E** enquanto olha para uma obra, o quadro é destacado e um painel com o título e o nome do artista é exibido na tela.
+O visitante pode explorar o museu livremente e interagir com os quadros expostos: ao pressionar **E** enquanto olha para uma obra, o quadro é destacado com uma cor diferente, um som de chime é reproduzido e um painel com o título e o nome do artista é exibido na tela.
 
 ---
 
@@ -31,7 +31,7 @@ O objetivo do espaço é simular uma experiência de visitação cultural imersi
 3. **Ambiente:** A sala do museu foi construída com primitivos do Unity (Plane, Cube, Sphere, Capsule), organizados em grupos lógicos na Hierarchy (`Sala` e `Exposicao`). Foram criados materiais com cores distintas para cada elemento, dando identidade visual ao espaço.
 
 4. **Interação:** A interação foi implementada em C# com dois scripts:
-   - `InteracaoQuadro.cs`: gerencia o estado de cada quadro (destaque de cor e informações da obra).
+   - `InteracaoQuadro.cs`: gerencia o estado de cada quadro — alterna a cor de destaque, reproduz um som de chime gerado proceduralmente (sem arquivo externo) e exibe as informações da obra.
    - `PlayerInteractor.cs`: lança um raycast do centro da câmera ao pressionar E, detecta quadros interagíveis e aciona a interação.
 
 5. **UI:** Um painel Canvas (Screen Space Overlay) exibe o título e o artista da obra ao interagir, com um crosshair central para auxiliar a mira.
